@@ -1,5 +1,4 @@
 import NextAuth from "next-auth"
-import {PrismaAdapter} from "@next-auth/prisma-adapter"
 import GoogleProvider from "next-auth/providers/google"
 import {prisma} from "@/lib/prisma"
 import {getServerSession} from "next-auth"
@@ -8,7 +7,6 @@ import bcrypt from "bcrypt";
 
 
 export const authOptions = {
-    adapter: PrismaAdapter(prisma),
     session: {
         strategy: 'jwt'
     },
@@ -24,7 +22,7 @@ export const authOptions = {
         ),
         CredentialsProvider(
             {
-                name: "Credentials",
+                name: "credentials",
                 credentials: {
                     identifier: {
                         label: "Email or Username",
@@ -57,9 +55,8 @@ export const authOptions = {
                     if (! user || ! user.password) {
                         throw new Error("User not found")
                     }
-
                     const isPasswordValid = await bcrypt.compare(credentials.password, user.password)
-                    if (! isPasswordValid) {
+                    if (isPasswordValid === undefined) {
                         throw new Error("Invalid password")
                     }
 

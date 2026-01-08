@@ -6,6 +6,7 @@ import Image from "next/image";
 import { signOut, useSession } from "next-auth/react";
 import {
   Heart,
+  Store,
   ShoppingCart,
   User2,
   Search,
@@ -14,6 +15,8 @@ import {
   ChevronDown,
   LogOut,
 } from "lucide-react";
+
+import { Play } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -48,13 +51,14 @@ export default function Header() {
               </h1>
             </Link>
 
-            <nav className="hidden md:flex items-center space-x-6">
+            <nav className="hidden md:flex items-center space-x-5">
               <Link
                 href="/"
                 className="text-gray-700 hover:text-purple-600 transition font-medium"
               >
                 Home
               </Link>
+              
               <Link
                 href="/products"
                 className="text-gray-700 hover:text-purple-600 transition font-medium"
@@ -62,7 +66,10 @@ export default function Header() {
                 Products
               </Link>
 
-              {/* Dropdown for Categories */}
+              
+              
+{/* 
+              Dropdown for Categories
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <div className="text-gray-700 font-medium px-2 py-1 hover:text-purple-600 hover:bg-none hover:cursor-pointer flex items-center">
@@ -83,7 +90,7 @@ export default function Header() {
                     <Link href="/category/home-decor">Home Decor</Link>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
-              </DropdownMenu>
+              </DropdownMenu> */}
 
               <Link
                 href="/about"
@@ -91,18 +98,33 @@ export default function Header() {
               >
                 About
               </Link>
+
+              
             </nav>
           </div>
 
           {/* Search + Icons */}
-          <div className="flex items-center space-x-3">
+          <div className="flex items-center space-x-2">
             {/* Search Box */}
-            <div className="hidden md:flex items-center space-x-2">
+            <div className="hidden lg:flex items-center space-x-1">
               <Search className="h-4 w-4 text-gray-400" />
               <Input placeholder="Search products..." className="w-64 text-sm" />
-            </div>
+          </div>
 
-            {/* Wishlist */}
+            {/* Reel */}
+            <Link href="/reels">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="relative hover:bg-purple-50"
+              >
+                <Play className="h-5 w-5 text-purple-600" />
+
+                {/* New reels indicator */}
+                <span className="absolute top-1 right-1 w-2 h-2 bg-pink-500 rounded-full animate-pulse" />
+              </Button>
+            </Link>
+
             <Link href="/wishlist">
               <Button
                 variant="ghost"
@@ -153,11 +175,14 @@ export default function Header() {
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
-                  <Link href="/profile">My Account</Link>
+                  <a href="/profile">My Account</a>
                 </DropdownMenuItem><DropdownMenuItem asChild>
-                  <Link href="/profile">View Orders</Link>
+                  <a href="/profile">View Orders</a>
                 </DropdownMenuItem><DropdownMenuItem asChild>
-                  <Link href="/profile">Your Wishlist</Link>
+                  <a href="/profile">Your Wishlist</a>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <a href="/profile"><Store></Store>Become a Seller</a>
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={() => signOut({ callbackUrl: "/auth/login" })}

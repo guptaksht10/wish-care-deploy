@@ -6,16 +6,17 @@ import { getServerSession } from "next-auth";
 export async function GET() {
   const session = await getServerSession();
 
-  if (!session?.user?.id) {
+  if (!session?.user?.email) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   const user = await prisma.user.findUnique({
-    where: { id: session.user.id },
+    where: { email: session.user.email },
     select: {
       id: true,
       name: true,
       username: true,
+      bio: true,
       email: true,
       image: true,
       role: true,
@@ -32,40 +33,37 @@ export async function GET() {
   return NextResponse.json(user);
 }
 
-
 export async function PATCH(req: Request) {
   const session = await getServerSession();
 
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!session?.user?.email) {
+    return NextResponse.json(
+      { error: "Unauthorized" },
+      { status: 401 }
+    );
   }
 
   const body = await req.json();
-  const { name, image, username } = body;
+  const { name, image, bio } = body;
 
-  // Optional: username uniqueness check
-  if (username) {
-    const exists = await prisma.user.findFirst({
-      where: {
-        username,
-        NOT: { id: session.user.id },
-      },
-    });
+  const user = await prisma.user.findUnique({
+    where: { email: session.user.email },
+    select: { id: true },
+  });
 
-    if (exists) {
-      return NextResponse.json(
-        { error: "Username already taken" },
-        { status: 400 }
-      );
-    }
+  if (!user) {
+    return NextResponse.json(
+      { error: "User not found" },
+      { status: 404 }
+    );
   }
 
   const updatedUser = await prisma.user.update({
-    where: { id: session.user.id },
+    where: { id: user.id },
     data: {
-      name,
-      image,
-      username,
+      ...(name !== undefined && { name }),
+      ...(image !== undefined && { image }),
+      ...(bio !== undefined && { bio }),
     },
   });
 

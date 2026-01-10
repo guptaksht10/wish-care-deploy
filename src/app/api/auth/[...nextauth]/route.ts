@@ -5,6 +5,7 @@ import {getServerSession} from "next-auth"
 import CredentialsProvider from "next-auth/providers/credentials"
 import bcrypt from "bcrypt";
 
+export const runtime = "nodejs";
 
 export const authOptions = {
     session: {
@@ -107,7 +108,6 @@ export const authOptions = {
                             email: user.email,
                             name: user.name,
                             image: user.image,
-                            role: 'user'
                         }
                     });
                     token.id = newUser.id;

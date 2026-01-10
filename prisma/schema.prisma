@@ -10,14 +10,15 @@ datasource db {
 
 model User {
   id            String    @id @default(auto()) @map("_id") @db.ObjectId
-  name          String?
+  name          String
   email         String?   @unique
   emailVerified DateTime?
   username      String    @unique @default(nanoid())
   password      String?
   image         String?
+  bio           String?
 
-  shop Shop?
+  shop   Shop?
 
   role String @default("user") // user, admin, seller
 
@@ -26,6 +27,7 @@ model User {
 
   accounts  Account[]
   sessions  Session[]
+
   cartItems CartItem[]
   orders    Order[]
   reviews   Review[]
@@ -51,13 +53,11 @@ model Shop {
   state   String?
   country String? @default("India")
 
-  // 🔒 Seller verification (future use)
   isVerified Boolean @default(false)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  // Relations
   owner    User      @relation(fields: [ownerId], references: [id])
   products Product[]
 }

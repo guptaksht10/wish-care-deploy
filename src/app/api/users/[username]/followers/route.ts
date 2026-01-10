@@ -16,6 +16,7 @@ export async function GET(
               id: true,
               name: true,
               username: true,
+              bio: true,
               image: true,
             },
           },

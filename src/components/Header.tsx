@@ -156,6 +156,7 @@ export default function Header() {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="icon" className="hover:bg-purple-50">
+                  
                   {session?.user?.image ? (
                     <Image
                       src={session.user.image}
@@ -171,7 +172,7 @@ export default function Header() {
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-44">
                 <DropdownMenuLabel>
-                  {session?.user?.name || "Account"}
+                  {session?.user?.name || "Manage Account"}
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>

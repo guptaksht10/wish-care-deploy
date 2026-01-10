@@ -1,16 +1,15 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useSession } from "next-auth/react";
-import { useEffect } from "react";
+import { useSession, signOut } from "next-auth/react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { signOut } from "next-auth/react";
 
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
+import EditProfileModal from "@/components/EditProfileModal";
 
 import {
   LogOut,
@@ -19,166 +18,221 @@ import {
   Heart,
   PackageSearch,
   Users,
+  Lock,
+  Globe,
+  MapPin,
+  MoreVertical,
+  Settings,
 } from "lucide-react";
 
 export default function ProfilePage() {
   const router = useRouter();
-  const { data: session, status } = useSession();
+  const { status } = useSession();
+  const [profile, setProfile] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [isPublic, setIsPublic] = useState(true);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [editOpen, setEditOpen] = useState(false);
+
 
   useEffect(() => {
-    if (status === "unauthenticated") {
-      router.replace("/auth/login");
-    }
+    if (status === "unauthenticated") router.replace("/auth/login");
   }, [status, router]);
 
-  if (status === "loading") {
+  useEffect(() => {
+    if (status === "authenticated") {
+      fetch("/api/users/me")
+        .then((res) => res.json())
+        .then(setProfile)
+        .finally(() => setLoading(false));
+    }
+  }, [status]);
+
+
+  if (loading || status === "loading") {
     return (
-      <div className="flex justify-center items-center min-h-screen text-gray-600 text-lg">
-        Checking authentication...
+      <div className="min-h-screen flex items-center justify-center text-lg text-gray-600">
+        Loading profile...
       </div>
     );
   }
 
-  if (!session) return null; // Prevent rendering before redirect
-
-  const user = {
-    name: session.user?.name || "User",
-    image: session.user?.image || "/avatars/placeholder.png",
-    bio: "Manifesting my wishlist, one like at a time.",
-    followers: 140,
-    following: 85,
-    friends: 50,
-    address: {
-      name: session.user?.name || "User",
-      line: "A-23, Sector 62, Noida, Uttar Pradesh",
-      pincode: "201301",
-      phone: "+91-9876543210",
-    },
-  };
-
-  const quickSections = [
-    {
-      title: "Wishlist",
-      count: 6,
-      icon: <Heart className="w-5 h-5 inline mr-1 text-pink-600" />,
-      gradient: "from-pink-700 to-purple-700",
-      link: "/wishlist",
-    },
-    {
-      title: "Cart",
-      count: 3,
-      icon: <ShoppingCart className="w-5 h-5 inline mr-1 text-pink-600" />,
-      gradient: "from-purple-700 to-pink-700",
-      link: "/cart",
-    },
-    {
-      title: "Orders",
-      count: 12,
-      icon: <PackageSearch className="w-5 h-5 inline mr-1 text-pink-600" />,
-      gradient: "from-pink-700 to-purple-700",
-      link: "/orders",
-    },
-  ];
+  if (!profile) return null;
 
   return (
     <>
       <Header />
-      <main className="min-h-screen bg-gradient-to-b from-purple-50 via-white to-pink-50 px-6 py-14">
-        <div className="max-w-5xl mx-auto space-y-16">
-          {/* 🧑 Profile Info */}
-          <motion.div
-            initial={{ opacity: 0, y: 40 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="flex flex-col md:flex-row items-center md:items-start gap-8 p-6 rounded-xl shadow-md"
-          >
-            <Image
-              src={user.image}
-              alt="Profile"
-              width={150}
-              height={150}
-              className="rounded-full border-4 border-pink-400 shadow-md object-cover"
+
+      {/* 🌸 Background upgraded */}
+      <main className="min-h-screen bg-gradient-to-br from-purple-100 via-pink-50 to-white px-6 py-14">
+        <div className="max-w-6xl mx-auto space-y-10">
+
+          {/* ================= PROFILE HEADER ================= */}
+          {editOpen ? (
+            <EditProfileModal
+              profile={profile}
+              onClose={() => setEditOpen(false)}
+              onSave={(updated: any) => {
+                setProfile(updated);
+                setEditOpen(false);
+              }}
             />
-            <div className="text-center md:text-left space-y-3">
-              <h2 className="text-4xl font-bold text-purple-700">{user.name}</h2>
-              <p className="text-gray-600 text-base">{user.bio}</p>
-              <div className="flex gap-4 justify-center md:justify-start text-sm text-gray-700">
-                <span><strong>Followers:</strong> {user.followers}</span>
-                <span><strong>Following:</strong> {user.following}</span>
-                <span
-                  onClick={() => router.push("/friends")}
-                  className="cursor-pointer text-purple-600 font-semibold hover:underline flex items-center gap-1"
-                >
-                  <Users className="w-4 h-4" />
-                  <strong>Friends:</strong> {user.friends}
-                </span>
-              </div>
+          ) : (
 
-              {/* 🔐 Buttons */}
-              <div className="flex gap-3 mt-2 justify-center md:justify-start">
-                <Button
-                  variant="outline"
-                  className="border-pink-300 text-pink-600 hover:bg-pink-100 cursor-pointer"
-                  onClick={() => router.push("/edit-profile")}
-                >
-                  <Pencil className="w-4 h-4 mr-2" />
-                  Edit Profile
-                </Button>
-                <Button
-                  variant="ghost"
-                  className="text-red-500 border border-red-300 hover:bg-red-100 cursor-pointer"
-                  onClick={() => signOut({ callbackUrl: "/auth/login" })}
-                >
-                  <LogOut className="w-4 h-4 mr-2" />
-                  Logout
-                </Button>
-              </div>
-            </div>
-          </motion.div>
-
-          {/* 🧾 Quick Stats */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-            {quickSections.map((item) => (
-              <Card
-                key={item.title}
-                onClick={() => router.push(item.link)}
-                className={`cursor-pointer hover:scale-110 transition-all duration-300 p-6 text-center rounded-xl shadow-md border border-purple-100 bg-gradient-to-br from-purple-500/50 to-pink-500/50`}
-              >
-                <h3
-                  className={`text-xl font-semibold bg-gradient-to-r ${item.gradient} bg-clip-text text-transparent`}
-                >
-                  {item.icon}
-                  {item.title}
-                </h3>
-                <p className="text-3xl font-bold mt-2 text-purple-700">{item.count}</p>
-              </Card>
-            ))}
-          </div>
-
-          {/* 📦 Shipping Address */}
-          <div className="space-y-3">
-            <h3 className="text-xl font-semibold text-purple-700">Shipping Address</h3>
-            <div className="p-4 bg-white rounded-lg shadow space-y-1 border border-gray-100">
-              <p><strong>Name:</strong> {user.address.name}</p>
-              <p><strong>Address:</strong> {user.address.line}</p>
-              <p><strong>Pincode:</strong> {user.address.pincode}</p>
-              <p><strong>Phone:</strong> {user.address.phone}</p>
-            </div>
-          </div>
-
-          {/* 🚀 CTA */}
-          <div className="text-center">
-            <Button
-              size="lg"
-              className="bg-gradient-to-r from-pink-500 to-purple-600 text-white px-6 py-3 rounded-full text-lg shadow-md hover:scale-105 transition cursor-pointer"
-              onClick={() => router.push("/")}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="relative bg-white/80 backdrop-blur-xl border border-purple-200 rounded-3xl shadow-xl p-8 flex flex-col md:flex-row gap-10 items-center"
             >
-              Go to Explore
-            </Button>
-          </div>
+              {/* ⋮ Three dots menu */}
+              <div className="absolute top-4 right-4">
+                <button
+                  onClick={() => setMenuOpen(!menuOpen)}
+                  className="p-2 rounded-full hover:bg-purple-100 transition"
+                >
+                  <MoreVertical className="w-5 h-5 text-gray-600" />
+                </button>
+
+                {menuOpen && (
+                  <div className="absolute right-0 mt-2 w-44 bg-white rounded-xl shadow-lg border overflow-hidden z-50">
+                    <MenuItem
+                      icon={<Pencil size={16} />}
+                      label="Edit Profile"
+                      onClick={() => {
+                        setMenuOpen(false);
+                        setEditOpen(true);
+                      }}
+                    />
+                    <MenuItem
+                      icon={<Settings size={16} />}
+                      label="Account Settings"
+                      onClick={() => router.push("/settings")}
+                    />
+                    <MenuItem
+                      icon={<LogOut size={16} />}
+                      label="Logout"
+                      danger
+                      onClick={() => signOut({ callbackUrl: "/auth/login" })}
+                    />
+                  </div>
+                )}
+              </div>
+
+              {/* Avatar */}
+              <Image
+                src={profile.image || "/avatars/placeholder.png"}
+                alt="Profile"
+                width={160}
+                height={160}
+                className="rounded-full ring-4 ring-pink-400 shadow-lg object-cover"
+              />
+
+              {/* Info */}
+              <div className="flex-1 space-y-4 text-center md:text-left">
+                <h2 className="text-4xl font-extrabold text-purple-700">
+                  {profile.name}
+                </h2>
+
+                <p className="text-gray-600 max-w-xl">
+                  {profile.bio || "No bio added yet."}
+                </p>
+
+                {/* Privacy Toggle */}
+                <div
+                  onClick={() => setIsPublic(!isPublic)}
+                  className="inline-flex text-sm items-center gap-2 px-4 py-2 rounded-full cursor-pointer bg-purple-100 text-purple-700 font-semibold w-fit hover:bg-purple-200 transition"
+                >
+                  {isPublic ? <Globe size={12} /> : <Lock size={12} />}
+                  {isPublic ? "Public Profile" : "Private Profile"}
+                </div>
+
+                {/* Stats */}
+                <div className="flex gap-4 justify-center md:justify-start text-sm text-gray-700">
+                  <span><strong>Followers:</strong> {profile._count?.followers ?? 0}</span>
+                  <span><strong>Following:</strong> {profile._count?.following ?? 0}</span>
+                  <span
+                    onClick={() => router.push("/friends")}
+                    className="cursor-pointer text-purple-600 font-semibold hover:underline flex items-center gap-1"
+                  >
+                    <Users className="w-4 h-4" />
+                    Friends: {profile._count?.friends ?? 0}
+                  </span>
+                </div>
+              </div>
+            </motion.div>
+          )}
+          {/* ================= ADDRESSES ================= */}
+          <Section title="📍 Saved Addresses">
+            {profile.address ? (
+              <div className="flex items-start gap-3">
+                <MapPin className="text-pink-500 mt-1" />
+                <p className="text-gray-700 leading-relaxed">
+                  {profile.address.line1}, {profile.address.city},{" "}
+                  {profile.address.state} - {profile.address.pincode}
+                </p>
+              </div>
+            ) : (
+              <p className="text-gray-600">No address added yet.</p>
+            )}
+          </Section>
+
+          {/* ================= ORDER TIMELINE ================= */}
+          <Section title="🚚 Latest Order">
+            <div className="space-y-4">
+              <TimelineItem label="Order Placed" />
+              <div className="ml-6 text-sm text-gray-500">
+                Order ID: <strong>123456789</strong><br />
+                Shipped on: 12 Jan 2024
+              </div>
+              <TimelineItem label="Shipped" />
+              <TimelineItem label="Out for Delivery" />
+              <TimelineItem label="Delivered" active />
+            </div>
+          </Section>
+
         </div>
       </main>
+
       <Footer />
     </>
+  );
+}
+
+/* ================= HELPERS ================= */
+
+function Section({ title, children }: any) {
+  return (
+    <div className="bg-white rounded-2xl border border-purple-200 shadow-lg p-6 space-y-4">
+      <h3 className="text-xl font-bold text-purple-700">{title}</h3>
+      {children}
+    </div>
+  );
+}
+
+function TimelineItem({ label, active }: any) {
+  return (
+    <div className="flex items-center gap-3">
+      <div
+        className={`w-3 h-3 rounded-full ${active ? "bg-green-500" : "bg-purple-300"
+          }`}
+      />
+      <p className="text-gray-700 font-medium">{label}</p>
+    </div>
+  );
+}
+
+function MenuItem({ icon, label, onClick, danger }: any) {
+  return (
+    <button
+      onClick={onClick}
+      className={`w-full flex items-center gap-2 px-4 py-3 text-sm transition
+        ${danger
+          ? "text-red-500 hover:bg-red-50"
+          : "text-gray-700 hover:bg-purple-50"}
+      `}
+    >
+      {icon}
+      {label}
+    </button>
   );
 }

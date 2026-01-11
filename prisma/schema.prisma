@@ -46,6 +46,7 @@ model Shop {
   description String?
   logo        String?
   banner      String?
+  slug        String @unique
 
   phone   String?
   address String?
@@ -54,6 +55,7 @@ model Shop {
   country String? @default("India")
 
   isVerified Boolean @default(false)
+  gstin      String
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -100,7 +102,7 @@ model Product {
   slug        String   @unique
   description String?
   price       Float
-  image       String?
+  image       String[]
   category    String?
   tags        String[]
   stock       Int      @default(0)

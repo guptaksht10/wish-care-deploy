@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { signOut, useSession } from "next-auth/react";
+import ReelsModal from "@/components/reels/ReelsModal";
 import {
   Heart,
   Store,
@@ -32,6 +33,8 @@ import {
 export default function Header() {
   const [theme, setTheme] = useState("light");
   const [mounted, setMounted] = useState(false);
+  const [openReels, setOpenReels] = useState(false);
+
 
   const { data: session } = useSession();
 
@@ -117,6 +120,7 @@ export default function Header() {
                 variant="ghost"
                 size="icon"
                 className="relative hover:bg-purple-50"
+                onClick={() => setOpenReels(true)}
               >
                 <Play className="h-5 w-5 text-purple-600" />
 
@@ -124,6 +128,7 @@ export default function Header() {
                 <span className="absolute top-1 right-1 w-2 h-2 bg-pink-500 rounded-full animate-pulse" />
               </Button>
             </Link>
+            
 
             <Link href="/wishlist">
               <Button
@@ -183,7 +188,7 @@ export default function Header() {
                   <a href="/profile">Your Wishlist</a>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <a href="/profile"><Store></Store>Become a Seller</a>
+                  <a href="/shop/register"><Store></Store>Become a Seller</a>
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={() => signOut({ callbackUrl: "/auth/login" })}
@@ -211,6 +216,7 @@ export default function Header() {
               </Button>
             )}
           </div>
+          <ReelsModal open={openReels} onClose={() => setOpenReels(false)} />
         </div>
       </div>
     </header>

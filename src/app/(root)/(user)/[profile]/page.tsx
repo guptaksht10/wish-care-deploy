@@ -23,6 +23,7 @@ import {
   MapPin,
   MoreVertical,
   Settings,
+  Store,
 } from "lucide-react";
 
 export default function ProfilePage() {
@@ -107,6 +108,11 @@ export default function ProfilePage() {
                       icon={<Settings size={16} />}
                       label="Account Settings"
                       onClick={() => router.push("/settings")}
+                    />
+                    <MenuItem
+                      icon={<Store size={16} />}
+                      label="Become a Seller"
+                      onClick={() => router.push("/shop/register")}
                     />
                     <MenuItem
                       icon={<LogOut size={16} />}

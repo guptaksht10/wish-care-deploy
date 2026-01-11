@@ -1,14 +1,31 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import ReactPlayer from "react-player";
 import { Heart, MessageCircle, Share2 } from "lucide-react";
 import Image from "next/image";
 
 export default function ReelCard({ reel }: any) {
-  const [playing, setPlaying] = useState(true);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [playing, setPlaying] = useState(false); // ❗ start false
   const [liked, setLiked] = useState(false);
   const [likes, setLikes] = useState(reel.likes);
+
+  // 👇 Play ONLY when visible
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setPlaying(entry.isIntersecting);
+      },
+      { threshold: 0.6 } // 60% visible = play
+    );
+
+    if (containerRef.current) {
+      observer.observe(containerRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, []);
 
   const toggleLike = () => {
     setLiked(!liked);
@@ -16,12 +33,12 @@ export default function ReelCard({ reel }: any) {
   };
 
   return (
-    <div className="relative h-full w-full bg-black flex justify-center">
+    <div
+      ref={containerRef}
+      className="relative h-full w-full bg-black flex justify-center"
+    >
       {/* VIDEO WRAPPER */}
-      <div
-        className="relative h-full w-[360px] sm:w-[420px]"
-        onClick={() => setPlaying(!playing)}
-      >
+      <div className="relative h-full w-[360px] sm:w-[420px]">
         <ReactPlayer
           url={reel.video}
           playing={playing}
@@ -33,15 +50,6 @@ export default function ReelCard({ reel }: any) {
           playsinline
           className="object-cover"
         />
-
-        {/* PAUSE ICON */}
-        {!playing && (
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="bg-black/60 text-white text-3xl p-4 rounded-full">
-              ▶
-            </div>
-          </div>
-        )}
 
         {/* LEFT INFO */}
         <div className="absolute bottom-24 left-4 text-white space-y-3">

@@ -5,6 +5,12 @@ export async function GET(
   req: Request,
   { params }: { params: { slug: string } }
 ) {
+  const session = await getServerSession();
+
+  if (!session?.user?.email) {
+    return Response.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   const shop = await prisma.shop.findUnique({
     where: { slug: params.slug },
     include: {
@@ -20,6 +26,7 @@ export async function GET(
       },
       owner: {
         select: {
+          email: true,
           username: true,
           image: true,
         },
@@ -29,6 +36,13 @@ export async function GET(
 
   if (!shop) {
     return Response.json({ error: "Shop not found" }, { status: 404 });
+  }
+
+  if (shop.owner.email !== session.user.email) {
+    return Response.json(
+      { error: "Forbidden: Not your shop" },
+      { status: 403 }
+    );
   }
 
   return Response.json(shop);

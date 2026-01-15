@@ -1,8 +1,10 @@
 "use client";
 
+import Loader from "@/components/Loader";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
+import { Toaster } from "sonner";
 
 export default function ProtectedLayout({ children }: { children: React.ReactNode }) {
   const { data: session, status } = useSession();
@@ -16,11 +18,24 @@ export default function ProtectedLayout({ children }: { children: React.ReactNod
 
   if (status === "loading") {
     return (
-      <div className="flex items-center justify-center min-h-screen text-xl text-gray-600">
-        Checking authentication...
-      </div>
+      <Loader />
     );
   }
 
-  return <>{children}</>;
+  return <>
+    {children}
+    <Toaster
+      position="bottom-right"
+      toastOptions={{
+    classNames: {
+      toast:
+        "bg-white/90 backdrop-blur-xl border border-pink-200 shadow-xl rounded-xl",
+      title: "text-gray-800 font-semibold",
+      description: "text-gray-600",
+      success: "border-l-4 border-pink-500",
+      error: "border-l-4 border-red-500",
+    },
+  }}
+/>
+</>;
 }

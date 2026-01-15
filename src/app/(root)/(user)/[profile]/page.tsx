@@ -10,6 +10,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import EditProfileModal from "@/components/EditProfileModal";
+import Loader from "@/components/Loader";
 
 import {
   LogOut,
@@ -52,13 +53,32 @@ export default function ProfilePage() {
 
   if (loading || status === "loading") {
     return (
-      <div className="min-h-screen flex items-center justify-center text-lg text-gray-600">
-        Loading profile...
-      </div>
+      <Loader />
     );
   }
 
-  if (!profile) return null;
+  if (!profile) {
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-100 via-pink-50 to-white px-4">
+      <div className="bg-white/80 backdrop-blur-xl border border-purple-200 rounded-2xl shadow-xl p-8 text-center max-w-md">
+        <h2 className="text-xl font-bold text-purple-700">
+          Something went wrong
+        </h2>
+        <p className="mt-2 text-gray-600">
+          We couldn’t load your profile. Please try again.
+        </p>
+
+        <button
+          onClick={() => window.location.reload()}
+          className="mt-6 px-6 py-2 rounded-full bg-gradient-to-r from-purple-600 to-pink-500 text-white font-semibold shadow hover:opacity-90 transition"
+        >
+          Retry
+        </button>
+      </div>
+    </div>
+  );
+}
+
 
   return (
     <>

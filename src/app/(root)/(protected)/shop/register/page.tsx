@@ -17,6 +17,27 @@ import Inventory2Icon from "@mui/icons-material/Inventory2";
 import ShoppingBagIcon from "@mui/icons-material/ShoppingBag";
 import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 import PaymentsIcon from "@mui/icons-material/Payments";
+import PeopleAltIcon from "@mui/icons-material/PeopleAlt";
+import FavoriteIcon from "@mui/icons-material/Favorite";
+import InsightsIcon from "@mui/icons-material/Insights";
+
+const sellerBenefits = [
+  {
+    icon: <PeopleAltIcon className="text-pink-500" />,
+    title: "Social Discovery",
+    desc: "Your products appear via friends & followers",
+  },
+  {
+    icon: <FavoriteIcon className="text-purple-500" />,
+    title: "Trust Signals",
+    desc: "Likes & wishlists boost conversions",
+  },
+  {
+    icon: <InsightsIcon className="text-indigo-500" />,
+    title: "Smart Insights",
+    desc: "Know what users actually want",
+  },
+];
 
 const journeySteps = [
   {
@@ -102,116 +123,16 @@ export default function RegisterShopPage() {
     <>
       <Header />
 
-      <main className="min-h-screen bg-gradient-to-b from-pink-50 via-white to-purple-50 px-6 py-16">
-        {/* FORM SECTION */}
-        <motion.section
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="max-w-xl mx-auto"
-        >
-          <div className="text-center mb-10">
-            <h1 className="text-4xl font-extrabold bg-gradient-to-r from-pink-500 to-purple-600 text-transparent bg-clip-text">
-              Register Your Shop
-            </h1>
-            <p className="text-gray-600 mt-3">
-              Start selling and grow socially on WishCare ✨
-            </p>
-          </div>
-
-          <Card className="rounded-2xl shadow-lg border border-gray-100">
-            <CardContent className="p-6 space-y-6">
-              <div className="space-y-2">
-                <Label>Shop Name</Label>
-                <Input
-                  name="name"
-                  placeholder="e.g. Akshat Gadgets"
-                  value={form.name}
-                  onChange={handleChange}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label>Description</Label>
-                <Textarea
-                  name="description"
-                  placeholder="Tell customers about your shop..."
-                  value={form.description}
-                  onChange={handleChange}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label>GSTIN</Label>
-                <Input
-                  name="gstin"
-                  placeholder="22AAAAA0000A1Z5"
-                  value={form.gstin}
-                  onChange={handleChange}
-                />
-                <p className="text-xs text-gray-500">
-                  Required for seller verification
-                </p>
-              </div>
-
-              <div className="space-y-2">
-                <Label>Logo URL (optional)</Label>
-                <Input
-                  name="logo"
-                  placeholder="https://logo-url.com/logo.png"
-                  value={form.logo}
-                  onChange={handleChange}
-                />
-              </div>
-
-              {/* Images Array */}
-              <div className="space-y-3">
-                <Label>Shop Images</Label>
-
-                {form.images.map((img, idx) => (
-                  <Input
-                    key={idx}
-                    placeholder={`Image URL ${idx + 1}`}
-                    value={img}
-                    onChange={(e) => {
-                      const images = [...form.images];
-                      images[idx] = e.target.value;
-                      setForm({ ...form, images });
-                    }}
-                  />
-                ))}
-
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="w-full"
-                  onClick={() =>
-                    setForm({ ...form, images: [...form.images, ""] })
-                  }
-                >
-                  + Add another image
-                </Button>
-              </div>
-
-              <Button
-                disabled={loading}
-                onClick={handleSubmit}
-                className="w-full bg-gradient-to-r from-pink-500 to-purple-600 text-white hover:brightness-110"
-              >
-                {loading ? "Creating..." : "Create Shop"}
-              </Button>
-            </CardContent>
-          </Card>
-        </motion.section>
+      <main className="min-h-screen bg-gradient-to-b from-pink-100 via-purple-50 to-purple-100 px-6 py-20">
 
         {/* JOURNEY SECTION */}
-        <section className="mt-28 max-w-7xl mx-auto">
+        <section className="max-w-7xl mx-auto mb-28">
           <div className="text-center mb-14">
             <h2 className="text-4xl font-extrabold bg-gradient-to-r from-pink-500 to-purple-600 text-transparent bg-clip-text">
-              Your Journey on WishCare
+              Start Selling on WishCare
             </h2>
-            <p className="text-gray-600 mt-3">
-              Starting your online business with WishCare is simple
+            <p className="text-gray-700 mt-3 max-w-2xl mx-auto">
+              Build trust, sell socially, and grow faster using your network.
             </p>
           </div>
 
@@ -235,6 +156,155 @@ export default function RegisterShopPage() {
             ))}
           </div>
         </section>
+
+        {/* REGISTRATION SECTION */}
+<motion.section
+  initial={{ opacity: 0, y: 30 }}
+  animate={{ opacity: 1, y: 0 }}
+  transition={{ duration: 0.6 }}
+  className="max-w-7xl mx-auto"
+>
+  <div className="relative grid md:grid-cols-[1fr_auto_1fr] gap-10 items-stretch">
+
+    {/* LEFT PANEL */}
+    {/* LEFT – INFO (NO WHITE CARD) */}
+          <motion.div
+            initial={{ opacity: 0, x: -40 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6 }}
+            className="space-y-10 px-md-10"
+          >
+            <h1 className="text-4xl font-extrabold leading-tight bg-gradient-to-r from-pink-500 to-purple-600 text-transparent bg-clip-text">
+              Sell Socially. Grow Faster !!
+            </h1>
+
+            <p className="text-lg text-gray-700 max-w-xl">
+              WishCare helps sellers grow using trust, friends, and social proof —
+              not ads.
+            </p>
+
+            <div className="space-y-6">
+              {sellerBenefits.map((b, i) => (
+                <div key={i} className="flex gap-4 items-start">
+                  <div className="p-3 rounded-xl bg-white/70 backdrop-blur border">
+                    {b.icon}
+                  </div>
+                  <div>
+                    <h3 className="font-semibold">{b.title}</h3>
+                    <p className="text-sm text-gray-600">{b.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="rounded-xl bg-gradient-to-r from-pink-500 to-purple-600 p-5 text-white shadow-lg max-w-md">
+              🚀 <strong>Early sellers</strong> get priority discovery & featured
+              placement.
+            </div>
+          </motion.div>
+    {/* VERTICAL DIVIDER (DESKTOP ONLY) */}
+    <div className="hidden md:flex items-center justify-center">
+      <div className="h-full w-px bg-gradient-to-b from-transparent via-purple-300 to-transparent" />
+    </div>
+
+    {/* RIGHT PANEL (FORM CARD) */}
+    <div className="bg-white rounded-3xl border border-gray-100 shadow-2xl p-10">
+      <div className="text-center mb-10">
+        <h1 className="text-3xl font-extrabold bg-gradient-to-r from-pink-500 to-purple-600 text-transparent bg-clip-text">
+          Register Your Shop
+        </h1>
+        <p className="text-gray-600 mt-3">
+          Create your seller profile and start listing products.
+        </p>
+      </div>
+
+      <div className="space-y-6">
+
+        <div className="space-y-2">
+          <Label>Shop Name</Label>
+          <Input
+            name="name"
+            placeholder="e.g. Akshat Gadgets"
+            value={form.name}
+            onChange={handleChange}
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label>Description</Label>
+          <Textarea
+            name="description"
+            placeholder="What do you sell? Why should customers trust you?"
+            value={form.description}
+            onChange={handleChange}
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label>GSTIN</Label>
+          <Input
+            name="gstin"
+            placeholder="22AAAAA0000A1Z5"
+            value={form.gstin}
+            onChange={handleChange}
+          />
+          <p className="text-xs text-gray-500">
+            Required for verification & payouts
+          </p>
+        </div>
+
+        <div className="space-y-2">
+          <Label>Shop Logo (optional)</Label>
+          <Input
+            name="logo"
+            placeholder="https://logo-url.com/logo.png"
+            value={form.logo}
+            onChange={handleChange}
+          />
+        </div>
+
+        <div className="space-y-3">
+          <Label>Shop Images</Label>
+          {form.images.map((img, idx) => (
+            <Input
+              key={idx}
+              placeholder={`Image URL ${idx + 1}`}
+              value={img}
+              onChange={(e) => {
+                const images = [...form.images];
+                images[idx] = e.target.value;
+                setForm({ ...form, images });
+              }}
+            />
+          ))}
+
+          <Button
+            type="button"
+            variant="outline"
+            className="w-full"
+            onClick={() =>
+              setForm({ ...form, images: [...form.images, ""] })
+            }
+          >
+            + Add another image
+          </Button>
+        </div>
+
+        <Button
+          disabled={loading}
+          onClick={handleSubmit}
+          className="w-full bg-gradient-to-r from-pink-500 to-purple-600 text-white hover:brightness-110"
+        >
+          {loading ? "Creating Shop..." : "Create Shop"}
+        </Button>
+      </div>
+    </div>
+
+  </div>
+</motion.section>
+
+
+          
       </main>
 
       <Footer />

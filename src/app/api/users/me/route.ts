@@ -29,7 +29,7 @@ export async function GET() {
       },
     },
   });
-
+  // console.log(user);
   return NextResponse.json(user);
 }
 

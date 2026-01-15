@@ -8,6 +8,7 @@ import ProductCard from "@/components/sections/ProductCard";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
+import Loader from "@/components/Loader";
 
 const FeaturedProducts = () => {
   const products = [
@@ -125,9 +126,7 @@ export default function DashboardPage() {
 
   if (status === "loading") {
     return (
-      <div className="flex items-center justify-center min-h-screen text-xl text-gray-600">
-        Checking authentication...
-      </div>
+      <Loader/>
     );
   }
   return (

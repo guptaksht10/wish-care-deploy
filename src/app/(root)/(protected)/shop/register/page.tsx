@@ -10,6 +10,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 // MUI Icons
 import StorefrontIcon from "@mui/icons-material/Storefront";
@@ -68,7 +70,10 @@ const journeySteps = [
 ];
 
 export default function RegisterShopPage() {
+  const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [isChecking, setIsChecking] = useState(true);
+
   const [form, setForm] = useState({
     name: "",
     description: "",
@@ -76,6 +81,27 @@ export default function RegisterShopPage() {
     gstin: "",
     images: [""],
   });
+
+ useEffect(() => {
+  const checkExistingShop = async () => {
+    try {
+      const res = await fetch("/api/shops");
+      const shop = await res.json();
+
+      if (shop?.slug) {
+        router.replace(`/shop/${shop.slug}`);
+        return;
+      }
+    } catch (err) {
+      console.error("Failed to check shop");
+    } finally {
+      setIsChecking(false); // ✅ allow page to render
+    }
+  };
+
+  checkExistingShop();
+}, []);
+
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -104,7 +130,7 @@ export default function RegisterShopPage() {
         return;
       }
 
-      toast.success("🎉 Shop registered successfully!");
+      toast.success("🎉 Shop registered successfully! Redirecting");
       setForm({
         name: "",
         description: "",
@@ -112,6 +138,7 @@ export default function RegisterShopPage() {
         gstin: "",
         images: [""],
       });
+      router.push(`/shop/${data.slug}`);
     } catch {
       toast.error("Something went wrong");
     } finally {
@@ -119,13 +146,23 @@ export default function RegisterShopPage() {
     }
   };
 
+
   return (
     <>
+    
       <Header />
 
       <main className="min-h-screen bg-gradient-to-b from-pink-100 via-purple-50 to-purple-100 px-6 py-20">
 
-        {/* JOURNEY SECTION */}
+       {isChecking ? (
+        <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-pink-100 via-purple-50 to-purple-100">
+          <p className="text-lg font-semibold text-purple-600 animate-pulse">
+            Checking your seller profile...
+          </p>
+        </div>
+       ) : (
+        <div>
+           {/* JOURNEY SECTION */}
         <section className="max-w-7xl mx-auto mb-28">
           <div className="text-center mb-14">
             <h2 className="text-4xl font-extrabold bg-gradient-to-r from-pink-500 to-purple-600 text-transparent bg-clip-text">
@@ -304,6 +341,8 @@ export default function RegisterShopPage() {
 </motion.section>
 
 
+        </div>
+       )}
           
       </main>
 

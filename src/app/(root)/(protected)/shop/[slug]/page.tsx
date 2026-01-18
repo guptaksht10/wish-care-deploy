@@ -1,5 +1,8 @@
 "use client";
 
+import { useEffect, useState } from "react";
+import { useParams, useRouter } from "next/navigation";
+
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
@@ -7,7 +10,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { motion } from "framer-motion";
 
-// MUI Icons
+// Icons
 import StorefrontIcon from "@mui/icons-material/Storefront";
 import Inventory2Icon from "@mui/icons-material/Inventory2";
 import ShoppingBagIcon from "@mui/icons-material/ShoppingBag";
@@ -16,45 +19,184 @@ import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 import AddIcon from "@mui/icons-material/Add";
 import SettingsIcon from "@mui/icons-material/Settings";
 
+type Product = {
+  id: string;
+  name: string;
+  price: number;
+  image?: string;
+  slug: string;
+};
+
+type Shop = {
+  id: string;
+  name: string;
+  slug: string;
+  owner: {
+    username: string;
+    image?: string;
+  };
+  products: Product[];
+};
+
+type ErrorType = "FORBIDDEN" | "NOT_FOUND" | "UNKNOWN" | null;
+
 export default function ShopDashboardPage() {
+  const { slug } = useParams<{ slug: string }>();
+  const router = useRouter();
+
+  const [shop, setShop] = useState<Shop | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<ErrorType>(null);
+
+  useEffect(() => {
+    if (!slug) return;
+
+    const fetchShop = async () => {
+      try {
+        const res = await fetch(`/api/shops/${slug}`);
+
+        if (res.status === 401) {
+          router.push("/login");
+          return;
+        }
+
+        if (res.status === 403) {
+          setError("FORBIDDEN");
+          return;
+        }
+
+        if (res.status === 404) {
+          setError("NOT_FOUND");
+          return;
+        }
+
+        if (!res.ok) {
+          throw new Error("Failed");
+        }
+
+        const data = await res.json();
+        setShop(data);
+      } catch (err) {
+        console.error(err);
+        setError("UNKNOWN");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchShop();
+  }, [slug, router]);
+
+  /* -------------------- LOADING -------------------- */
+  if (loading) {
+    return (
+      <>
+        <Header />
+        <main className="min-h-screen flex items-center justify-center">
+          <p className="text-gray-500">Loading dashboard...</p>
+        </main>
+        <Footer />
+      </>
+    );
+  }
+
+  /* -------------------- ERROR PAGE -------------------- */
+  if (error) {
+    return (
+      <>
+        <Header />
+        <main className="min-h-screen flex items-center justify-center px-6">
+          <div className="max-w-md text-center space-y-4">
+            <h1 className="text-2xl font-bold text-gray-800">
+              {error === "FORBIDDEN" && "Access Denied"}
+              {error === "NOT_FOUND" && "Shop Not Found"}
+              {error === "UNKNOWN" && "Something Went Wrong"}
+            </h1>
+
+            <p className="text-gray-500">
+              {error === "FORBIDDEN" &&
+                "You don’t have permission to view this shop dashboard."}
+              {error === "NOT_FOUND" &&
+                "The shop you’re trying to access does not exist."}
+              {error === "UNKNOWN" &&
+                "An unexpected error occurred. Please try again later."}
+            </p>
+
+            <Button variant="outline" onClick={() => router.push("/")}>
+              Go Home
+            </Button>
+          </div>
+        </main>
+        <Footer />
+      </>
+    );
+  }
+
+  if (!shop) return null;
+
+  /* -------------------- STATS -------------------- */
+  const stats = [
+    {
+      label: "Products",
+      value: shop.products.length,
+      icon: <Inventory2Icon className="text-pink-500" />,
+    },
+    {
+      label: "Orders",
+      value: 0,
+      icon: <ShoppingBagIcon className="text-purple-500" />,
+    },
+    {
+      label: "Likes",
+      value: 0,
+      icon: <FavoriteIcon className="text-red-500" />,
+    },
+    {
+      label: "Growth",
+      value: "+0%",
+      icon: <TrendingUpIcon className="text-green-500" />,
+    },
+  ];
+
+  /* -------------------- DASHBOARD -------------------- */
   return (
     <>
       <Header />
 
-      <main className="min-h-screen bg-gradient-to-br from-pink-100 via-purple-50 to-indigo-100 px-6 py-20">
+      <main className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-indigo-50 px-6 py-20">
         <div className="max-w-7xl mx-auto space-y-16">
 
           {/* SHOP HEADER */}
           <motion.section
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-pink-500 to-purple-600 p-10 text-white shadow-2xl"
+            className="rounded-3xl bg-gradient-to-r from-pink-500 to-purple-600 p-10 text-white shadow-xl"
           >
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
               <div className="flex items-center gap-5">
-                <div className="p-4 rounded-2xl bg-white/20 backdrop-blur">
+                <div className="p-4 rounded-2xl bg-white/20">
                   <StorefrontIcon fontSize="large" />
                 </div>
 
                 <div>
                   <h1 className="text-3xl font-extrabold">
-                    Akshat Gadgets
+                    {shop.name}
                   </h1>
                   <p className="text-sm opacity-90">
-                    Social-first electronics store
+                    @{shop.owner.username}
                   </p>
                 </div>
               </div>
 
               <div className="flex gap-3">
-                <Button className="bg-white text-purple-600 hover:bg-white/90">
+                <Button className="bg-white text-purple-600">
                   <AddIcon className="mr-2" />
                   Add Product
                 </Button>
 
                 <Button
                   variant="outline"
-                  className="border-white text-white hover:bg-white/10"
+                  className="border-white text-white"
                 >
                   <SettingsIcon className="mr-2" />
                   Settings
@@ -65,114 +207,43 @@ export default function ShopDashboardPage() {
 
           {/* STATS */}
           <section className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {[
-              {
-                label: "Products",
-                value: 12,
-                icon: <Inventory2Icon className="text-pink-500" />,
-              },
-              {
-                label: "Orders",
-                value: 48,
-                icon: <ShoppingBagIcon className="text-purple-500" />,
-              },
-              {
-                label: "Likes",
-                value: 312,
-                icon: <FavoriteIcon className="text-red-500" />,
-              },
-              {
-                label: "Growth",
-                value: "+18%",
-                icon: <TrendingUpIcon className="text-green-500" />,
-              },
-            ].map((stat, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.1 }}
-              >
-                <Card className="rounded-2xl shadow-md">
-                  <CardContent className="p-6 flex items-center justify-between">
-                    <div>
-                      <p className="text-sm text-gray-500">
-                        {stat.label}
-                      </p>
-                      <h3 className="text-2xl font-bold">
-                        {stat.value}
-                      </h3>
-                    </div>
-                    <div className="p-3 rounded-xl bg-gray-100">
-                      {stat.icon}
-                    </div>
-                  </CardContent>
-                </Card>
-              </motion.div>
+            {stats.map((stat) => (
+              <Card key={stat.label} className="rounded-2xl">
+                <CardContent className="p-6 flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-gray-500">
+                      {stat.label}
+                    </p>
+                    <h3 className="text-2xl font-bold">
+                      {stat.value}
+                    </h3>
+                  </div>
+                  <div className="p-3 rounded-xl bg-gray-100">
+                    {stat.icon}
+                  </div>
+                </CardContent>
+              </Card>
             ))}
           </section>
 
-          {/* RECENT ACTIVITY */}
-          <section className="grid lg:grid-cols-2 gap-8">
-            {/* Orders */}
-            <Card className="rounded-3xl shadow-xl">
-              <CardContent className="p-8">
-                <h2 className="text-xl font-bold mb-6">
-                  Recent Orders
-                </h2>
+          {/* PRODUCTS */}
+          <section>
+            <h2 className="text-xl font-bold mb-4">
+              Products
+            </h2>
 
-                <div className="space-y-4">
-                  {[1, 2, 3].map((_, i) => (
-                    <div
-                      key={i}
-                      className="flex items-center justify-between p-4 rounded-xl bg-gray-50"
-                    >
-                      <div>
-                        <p className="font-medium">
-                          Wireless Headphones
-                        </p>
-                        <p className="text-xs text-gray-500">
-                          Ordered by Rahul
-                        </p>
-                      </div>
-
-                      <Badge className="bg-green-100 text-green-700">
-                        Paid
-                      </Badge>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Popular Products */}
-            <Card className="rounded-3xl shadow-xl">
-              <CardContent className="p-8">
-                <h2 className="text-xl font-bold mb-6">
-                  Top Liked Products
-                </h2>
-
-                <div className="space-y-4">
-                  {[1, 2, 3].map((_, i) => (
-                    <div
-                      key={i}
-                      className="flex items-center justify-between p-4 rounded-xl bg-gray-50"
-                    >
-                      <div>
-                        <p className="font-medium">
-                          Smart Watch Pro
-                        </p>
-                        <p className="text-xs text-gray-500">
-                          124 likes
-                        </p>
-                      </div>
-
-                      <FavoriteIcon className="text-pink-500" />
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {shop.products.map((product) => (
+                <Card key={product.id} className="rounded-xl">
+                  <CardContent className="p-4">
+                    <p className="font-medium">{product.name}</p>
+                    <p className="text-sm text-gray-500">
+                      ₹{product.price}
+                    </p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
           </section>
 
         </div>

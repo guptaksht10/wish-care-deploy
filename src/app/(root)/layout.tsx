@@ -29,7 +29,7 @@ export default function ProtectedLayout({ children }: { children: React.ReactNod
       toastOptions={{
     classNames: {
       toast:
-        "bg-white/90 backdrop-blur-xl border border-pink-200 shadow-xl rounded-xl",
+        "bg-white/90 backdrop-blur-xl border border-pink-200 shadow-xl rounded-xl text-md",
       title: "text-gray-800 font-semibold",
       description: "text-gray-600",
       success: "border-l-4 border-pink-500",

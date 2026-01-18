@@ -49,7 +49,7 @@ export async function POST(req : Request) {
 
     if (existingShop) {
         return Response.json({
-            error: "Shop already exists"
+            error: "Shop name already exists"
         }, {status: 409});
     }
 
@@ -88,13 +88,13 @@ export async function POST(req : Request) {
 
 export async function GET() {
     const session = await getServerSession();
-    if (! session ?. user ?. email) {
+    if (!session?.user?.email) {
         return Response.json({
             error: "Unauthorized"
         }, {status: 401});
     }
 
-    const shops = await prisma.shop.findMany({
+    const shops = await prisma.shop.findFirst({
         where: {
             owner: {
                 email: session.user.email !

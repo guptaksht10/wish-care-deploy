@@ -9,6 +9,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { motion } from "framer-motion";
+import AddProductModal from "@/components/AddProductModal";
+
 
 // Icons
 import StorefrontIcon from "@mui/icons-material/Storefront";
@@ -47,6 +49,8 @@ export default function ShopDashboardPage() {
   const [shop, setShop] = useState<Shop | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<ErrorType>(null);
+  const [showAddProduct, setShowAddProduct] = useState(false);
+
 
   useEffect(() => {
     if (!slug) return;
@@ -162,6 +166,19 @@ export default function ShopDashboardPage() {
   return (
     <>
       <Header />
+      <AddProductModal
+        open={showAddProduct}
+        onClose={() => setShowAddProduct(false)}
+        shopId={shop.id}
+        onCreated={(product) => {
+          setShop((prev) =>
+            prev
+              ? { ...prev, products: [product, ...prev.products] }
+              : prev
+          );
+        }}
+      />
+
 
       <main className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-indigo-50 px-6 py-20">
         <div className="max-w-7xl mx-auto space-y-16">
@@ -189,14 +206,18 @@ export default function ShopDashboardPage() {
               </div>
 
               <div className="flex gap-3">
-                <Button className="bg-white text-purple-600">
+                <Button
+                  variant="outline"
+                  className="border-white text-purple-600"
+                  onClick={() => setShowAddProduct(true)}
+                >
                   <AddIcon className="mr-2" />
                   Add Product
                 </Button>
 
                 <Button
                   variant="outline"
-                  className="border-white text-white"
+                  className="border-white text-purple-600"
                 >
                   <SettingsIcon className="mr-2" />
                   Settings
@@ -226,25 +247,67 @@ export default function ShopDashboardPage() {
             ))}
           </section>
 
-          {/* PRODUCTS */}
-          <section>
-            <h2 className="text-xl font-bold mb-4">
-              Products
-            </h2>
+<section>
+  <h2 className="text-xl font-bold mb-4">
+    Products
+  </h2>
 
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {shop.products.map((product) => (
-                <Card key={product.id} className="rounded-xl">
-                  <CardContent className="p-4">
-                    <p className="font-medium">{product.name}</p>
-                    <p className="text-sm text-gray-500">
-                      ₹{product.price}
-                    </p>
-                  </CardContent>
-                </Card>
-              ))}
+  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    {shop.products.map((product) => (
+      <div
+        key={product.id}
+        onClick={() => router.push(`/product/${product.slug}`)}
+        className="cursor-pointer flex items-center justify-between gap-4 rounded-xl border bg-white p-4 hover:shadow-lg hover:border-purple-300 transition"
+      >
+        {/* LEFT: DETAILS */}
+        <div className="flex-1 space-y-1">
+          <p className="font-semibold text-gray-900">
+            {product.name}
+          </p>
+
+          <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-500">
+            <span>
+              <strong className="text-purple-700">Price:</strong> ₹{product.price}
+            </span>
+
+            {product.category && (
+              <span>
+                <strong className="text-purple-700">Category:</strong>{" "}
+                {product.category}
+              </span>
+            )}
+
+            <span>
+              <strong className="text-purple-700">Views:</strong>{" "}
+              {product.views ?? 0}
+            </span>
+
+            <span>
+              <strong className="text-purple-700">Likes:</strong>{" "}
+              {product.likes?.length ?? 0}
+            </span>
+          </div>
+        </div>
+
+        {/* RIGHT: IMAGE */}
+        <div className="h-20 w-20 flex-shrink-0 overflow-hidden rounded-lg bg-gray-100">
+          {product.image?.length > 0 ? (
+            <img
+              src={product.image[0]}
+              alt={product.name}
+              className="h-full w-full object-cover"
+            />
+          ) : (
+            <div className="h-full w-full flex items-center justify-center text-xs text-gray-400">
+              No Image
             </div>
-          </section>
+          )}
+        </div>
+      </div>
+    ))}
+  </div>
+</section>
+
 
         </div>
       </main>

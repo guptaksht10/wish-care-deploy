@@ -35,6 +35,6 @@
     "src/app/api/auth/[...nextauth]/route.ts",
     "src",
     "src/types"
-  ],
+, "next.config.js"  ],
   "exclude": ["node_modules"]
 }

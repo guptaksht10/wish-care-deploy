@@ -83,11 +83,6 @@ export default function ProductDetailsPage() {
       <Footer />
 
       {/* LIKED BY */}
-      <LikedByModal
-        open={openLikes}
-        onClose={() => setOpenLikes(false)}
-        users={product.likedBy}
-      />
     </>
   );
 }

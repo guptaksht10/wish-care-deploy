@@ -270,28 +270,28 @@ export default function ShopDashboardPage() {
               <strong className="text-purple-700">Price:</strong> ₹{product.price}
             </span>
 
-            {product.category && (
+            {/* {product.category && (
               <span>
                 <strong className="text-purple-700">Category:</strong>{" "}
                 {product.category}
               </span>
-            )}
+            )} */}
 
             <span>
               <strong className="text-purple-700">Views:</strong>{" "}
-              {product.views ?? 0}
+              {0}
             </span>
 
             <span>
               <strong className="text-purple-700">Likes:</strong>{" "}
-              {product.likes?.length ?? 0}
+              {0}
             </span>
           </div>
         </div>
 
         {/* RIGHT: IMAGE */}
         <div className="h-20 w-20 flex-shrink-0 overflow-hidden rounded-lg bg-gray-100">
-          {product.image?.length > 0 ? (
+          {product.image && product.image.length > 0 ? (
             <img
               src={product.image[0]}
               alt={product.name}

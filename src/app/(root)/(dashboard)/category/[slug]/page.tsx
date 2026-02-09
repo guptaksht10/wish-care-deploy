@@ -24,7 +24,7 @@ export default function CategoryPage() {
   const slug = (params?.slug as string) || "";
 
   const categoryProducts = allProducts.filter(
-    (product) => product.category.toLowerCase() === slug.toLowerCase()
+    (product) => product?.category?.toLowerCase() === slug.toLowerCase()
   );
 
   return (

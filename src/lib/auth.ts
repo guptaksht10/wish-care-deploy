@@ -35,8 +35,10 @@ export const authOptions: AuthOptions = {
         },
       },
 
-      async authorize(credentials: any) {
-        if (!credentials?.identifier || !credentials?.password) return null;
+      async authorize(credentials) {
+        if (!credentials?.identifier || !credentials?.password) {
+          return null;
+        }
 
         const user = await prisma.user.findFirst({
           where: {
@@ -56,7 +58,21 @@ export const authOptions: AuthOptions = {
 
         if (!valid) return null;
 
-        return user;
+        // ❗ Make sure required fields exist
+        if (!user.email || !user.username || !user.role) {
+          return null;
+        }
+
+        // ✅ Normalize for NextAuth
+        return {
+          id: user.id,
+          name: user.name ?? "",
+          email: user.email,
+          image: user.image ?? "",
+
+          username: user.username,
+          role: user.role,
+        };
       },
     }),
   ],

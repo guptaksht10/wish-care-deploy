@@ -40,14 +40,14 @@ export default function ReelCard({ reel }: any) {
       {/* VIDEO WRAPPER */}
       <div className="relative h-full w-[360px] sm:w-[420px]">
         <ReactPlayer
-          url={reel.video}
+          // url={reel.video}
           playing={playing}
           muted
           loop
           controls={false}
           width="100%"
           height="100%"
-          playsinline
+          // playsinline
           className="object-cover"
         />
 

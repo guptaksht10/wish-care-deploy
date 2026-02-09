@@ -1,9 +1,15 @@
 import { getServerSession } from "next-auth";
 import { prisma } from "@/lib/prisma";
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
+
+type Params = {
+  slug: string;
+};
 
 export async function GET(
-  req: Request,
-  context: { params: Promise<{ slug: string }> }
+  req: NextRequest,
+  context: { params: Promise<Params> }
 ) {
   const { slug } = await context.params;
 
@@ -11,15 +17,20 @@ export async function GET(
     const session = await getServerSession();
 
     if (!session?.user?.email) {
-      return Response.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json(
+        { error: "Unauthorized" },
+        { status: 401 }
+      );
     }
 
     const shop = await prisma.shop.findUnique({
-      where: { slug: slug },
+      where: { slug },
+
       select: {
         id: true,
         name: true,
         slug: true,
+
         owner: {
           select: {
             email: true,
@@ -31,11 +42,14 @@ export async function GET(
     });
 
     if (!shop) {
-      return Response.json({ error: "Shop not found" }, { status: 404 });
+      return NextResponse.json(
+        { error: "Shop not found" },
+        { status: 404 }
+      );
     }
 
     if (shop.owner.email !== session.user.email) {
-      return Response.json(
+      return NextResponse.json(
         { error: "Forbidden: Not your shop" },
         { status: 403 }
       );
@@ -46,6 +60,7 @@ export async function GET(
         shopId: shop.id,
         stock: { gt: 0 },
       },
+
       select: {
         id: true,
         name: true,
@@ -55,13 +70,15 @@ export async function GET(
       },
     });
 
-    return Response.json({
+    return NextResponse.json({
       ...shop,
       products,
     });
+
   } catch (error) {
     console.error("SHOP_GET_ERROR", error);
-    return Response.json(
+
+    return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }
     );

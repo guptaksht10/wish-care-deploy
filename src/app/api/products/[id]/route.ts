@@ -1,13 +1,20 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
+import type { NextRequest } from "next/server";
+
+type Params = {
+  id: string;
+};
 
 export async function GET(
-  req: Request,
-  { params }: { params: { id: string } }
+  req: NextRequest,
+  { params }: { params: Promise<Params> }
 ) {
+  const { id } = await params; // ✅ await params
+
   const product = await prisma.product.findUnique({
-    where: { id: params.id },
+    where: { id },
     include: {
       shop: true,
       reviews: {
@@ -33,24 +40,32 @@ export async function GET(
 }
 
 export async function PATCH(
-  req: Request,
-  { params }: { params: { id: string } }
+  req: NextRequest,
+  { params }: { params: Promise<Params> }
 ) {
+  const { id } = await params; // ✅
+
   const session = await getServerSession();
 
   if (!session?.user?.email) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    return NextResponse.json(
+      { error: "Unauthorized" },
+      { status: 401 }
+    );
   }
 
   const data = await req.json();
 
   const product = await prisma.product.findUnique({
-    where: { id: params.id },
+    where: { id },
     select: { shopId: true },
   });
 
   if (!product) {
-    return NextResponse.json({ error: "Product not found" }, { status: 404 });
+    return NextResponse.json(
+      { error: "Product not found" },
+      { status: 404 }
+    );
   }
 
   const ownsShop = await prisma.shop.findFirst({
@@ -61,35 +76,45 @@ export async function PATCH(
   });
 
   if (!ownsShop) {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    return NextResponse.json(
+      { error: "Forbidden" },
+      { status: 403 }
+    );
   }
 
   const updated = await prisma.product.update({
-    where: { id: params.id },
+    where: { id },
     data,
   });
 
   return NextResponse.json(updated);
 }
 
-
 export async function DELETE(
-  req: Request,
-  { params }: { params: { id: string } }
+  req: NextRequest,
+  { params }: { params: Promise<Params> }
 ) {
+  const { id } = await params; // ✅
+
   const session = await getServerSession();
 
   if (!session?.user?.email) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    return NextResponse.json(
+      { error: "Unauthorized" },
+      { status: 401 }
+    );
   }
 
   const product = await prisma.product.findUnique({
-    where: { id: params.id },
+    where: { id },
     select: { shopId: true },
   });
 
   if (!product) {
-    return NextResponse.json({ error: "Product not found" }, { status: 404 });
+    return NextResponse.json(
+      { error: "Product not found" },
+      { status: 404 }
+    );
   }
 
   const ownsShop = await prisma.shop.findFirst({
@@ -100,11 +125,14 @@ export async function DELETE(
   });
 
   if (!ownsShop) {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    return NextResponse.json(
+      { error: "Forbidden" },
+      { status: 403 }
+    );
   }
 
   await prisma.product.delete({
-    where: { id: params.id },
+    where: { id },
   });
 
   return NextResponse.json({ success: true });

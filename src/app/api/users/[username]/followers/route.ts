@@ -1,13 +1,20 @@
 import { NextResponse } from "next/server";
-import {prisma} from "@/lib/prisma";
+import { prisma } from "@/lib/prisma";
+import type { NextRequest } from "next/server";
 
+type Params = {
+  username: string;
+};
 
 export async function GET(
-  req: Request,
-  { params }: { params: { username: string } }
+  req: NextRequest,
+  { params }: { params: Promise<Params> }
 ) {
+  const { username } = await params; // ✅ await params
+
   const user = await prisma.user.findUnique({
-    where: { username: params.username },
+    where: { username },
+
     include: {
       followers: {
         include: {
@@ -26,8 +33,13 @@ export async function GET(
   });
 
   if (!user) {
-    return NextResponse.json({ error: "User not found" }, { status: 404 });
+    return NextResponse.json(
+      { error: "User not found" },
+      { status: 404 }
+    );
   }
 
-  return NextResponse.json(user.followers.map(f => f.follower));
+  return NextResponse.json(
+    user.followers.map((f) => f.follower)
+  );
 }

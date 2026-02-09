@@ -6,7 +6,6 @@ import bcrypt from "bcrypt";
 
 export const runtime = "nodejs";
 
-// ❌ REMOVE export here
 const authOptions = {
     session: {
         strategy: "jwt"
@@ -73,7 +72,7 @@ const authOptions = {
                         id: user.id,
                         name: user.name ?? "",
                         email: user.email ?? "",
-                        image: user.image ?? "", // 👈 important
+                        image: user.image ?? "", // important
 
                         username: user.username ?? "",
                         role: user.role ?? "USER"

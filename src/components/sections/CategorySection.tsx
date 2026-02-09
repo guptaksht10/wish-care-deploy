@@ -1,13 +1,15 @@
 "use client";
 
-import { categories } from "@/lib/fakeCategoryData";
+// import { categories } from "@/lib/fakeCategoryData";
 
 export default function CategorySection() {
-  return (
+    let categories: any[] = [];
+
+    return (
     <section className="my-8">
       <h2 className="text-2xl font-semibold mb-4">Shop by Category</h2>
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        {categories.map((category) => (
+        {categories && categories.map((category: any) => (
           <div
             key={category.id}
             className="border rounded-md p-2 flex flex-col items-center text-center"

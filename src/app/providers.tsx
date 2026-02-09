@@ -9,8 +9,13 @@ export function Providers({
   children: React.ReactNode;
 }) {
   return (
-    <SessionProvider>
-      <TooltipProvider>{children}</TooltipProvider>
+    <SessionProvider
+      refetchOnWindowFocus={false}
+      refetchInterval={0}
+    >
+      <TooltipProvider>
+        {children}
+      </TooltipProvider>
     </SessionProvider>
   );
 }

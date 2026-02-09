@@ -69,12 +69,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${poppins.className} antialiased`}>
-        {/* ✅ Wrap all children with TooltipProvider */}
-        <TooltipProvider>
-          <Providers>{children}</Providers>
-        </TooltipProvider>
-      </body>
+     <body className={`${poppins.className} antialiased`}>
+  <Providers>{children}</Providers>
+</body>
+
     </html>
   );
 }
